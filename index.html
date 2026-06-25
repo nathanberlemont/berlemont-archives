@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berlemont — Archives</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080808;
+      --surface: #111111;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e3dc;
+      --muted: rgba(232,227,220,0.4);
+      --accent: #c8b99a;
+      --cursor-size: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.6;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* ── Cursor ── */
+    #cursor {
+      position: fixed;
+      width: var(--cursor-size);
+      height: var(--cursor-size);
+      background: var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+      mix-blend-mode: difference;
+    }
+    #cursor.hovering {
+      width: 48px;
+      height: 48px;
+      opacity: 0.3;
+    }
+
+    /* ── Header ── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 48px;
+      background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .logo span { color: var(--muted); }
+
+    nav {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    nav a:hover, nav a.active { color: var(--text); }
+
+    /* ── Hero ── */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 48px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 70% 40%, rgba(200,185,154,0.06) 0%, transparent 60%);
+    }
+
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(64px, 10vw, 140px);
+      font-weight: 300;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      margin-top: 32px;
+      max-width: 360px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 48px;
+      right: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .hero-scroll-line {
+      width: 1px;
+      height: 60px;
+      background: var(--muted);
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+    @keyframes scrollLine {
+      0%, 100% { transform: scaleY(1); opacity: 0.4; }
+      50% { transform: scaleY(0.5); opacity: 0.1; }
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 0 48px;
+      margin-bottom: 64px;
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 16px 24px;
+      cursor: none;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .filter-btn::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 50%; right: 50%;
+      height: 1px;
+      background: var(--accent);
+      transition: left 0.3s ease, right 0.3s ease;
+    }
+    .filter-btn:hover { color: var(--text); }
+    .filter-btn.active { color: var(--text); }
+    .filter-btn.active::after { left: 0; right: 0; }
+
+    /* ── Gallery ── */
+    .gallery-section {
+      padding: 0 48px 120px;
+    }
+
+    .gallery-grid {
+      columns: 3;
+      column-gap: 20px;
+    }
+
+    @media (max-width: 1024px) { .gallery-grid { columns: 2; } }
+    @media (max-width: 600px)  { .gallery-grid { columns: 1; } }
+
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .gallery-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .gallery-item.hidden {
+      display: none;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      filter: brightness(0.9);
+    }
+    .gallery-item:hover img {
+      transform: scale(1.04);
+      filter: brightness(1);
+    }
+
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      display: flex;
+      align-items: flex-end;
+      padding: 20px;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+    .gallery-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .gallery-category {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .gallery-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--text);
+      font-style: italic;
+    }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(8,8,8,0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    #lightbox.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    #lightbox img {
+      max-width: 90vw;
+      max-height: 88vh;
+      object-fit: contain;
+      transform: scale(0.95);
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    #lightbox.open img { transform: scale(1); }
+
+    #lightbox-close {
+      position: absolute;
+      top: 32px; right: 48px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: none;
+      transition: color 0.2s;
+    }
+    #lightbox-close:hover { color: var(--text); }
+
+    #lightbox-nav {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .lb-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .lb-btn:hover { border-color: var(--accent); color: var(--accent); }
+    #lightbox-counter {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      min-width: 48px;
+      text-align: center;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+    footer a:hover { color: var(--text); }
+
+    /* ── Scroll reveal stagger ── */
+    .gallery-item:nth-child(3n+1) { transition-delay: 0s; }
+    .gallery-item:nth-child(3n+2) { transition-delay: 0.1s; }
+    .gallery-item:nth-child(3n)   { transition-delay: 0.2s; }
+
+    /* ── Mobile header ── */
+    @media (max-width: 768px) {
+      header { padding: 20px 24px; }
+      .hero { padding: 0 24px 60px; }
+      .filter-bar { padding: 0 24px; overflow-x: auto; white-space: nowrap; }
+      .gallery-section { padding: 0 24px 80px; }
+      footer { flex-direction: column; gap: 16px; text-align: center; padding: 32px 24px; }
+      .hero-scroll { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cursor"></div>
+
+  <!-- Header -->
+  <header>
+    <a href="#" class="logo">Berlemont <span>— Archives</span></a>
+    <nav>
+      <a href="#photographie" class="nav-link">Photographie</a>
+      <a href="#architecture" class="nav-link">Architecture</a>
+      <a href="#autres" class="nav-link">Autres</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <p class="hero-eyebrow">Nathan Berlemont</p>
+    <h1 class="hero-title">
+      Archives<br /><em>&amp; travaux</em>
+    </h1>
+    <p class="hero-desc">
+      Une collection de regards — photographie, architecture d'intérieur, et ce que l'on ne sait pas encore nommer.
+    </p>
+    <div class="hero-scroll">
+      <div class="hero-scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- Filter + Gallery -->
+  <section class="gallery-section" id="gallery">
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">Tout</button>
+      <button class="filter-btn" data-filter="photographie" id="photographie">Photographie</button>
+      <button class="filter-btn" data-filter="architecture" id="architecture">Architecture</button>
+      <button class="filter-btn" data-filter="autres" id="autres">Autres</button>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Les images sont définies ici. Remplace src="images/..." par tes fichiers. -->
+      <!-- Pour ajouter une image : copie un bloc <div class="gallery-item"> et change src, data-category, data-title -->
+
+      <div class="gallery-item" data-category="photographie" data-title="Sans titre, 2024">
+        <img src="images/photo-01.jpg" alt="Photographie 01" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Photographie</span>
+            <span class="gallery-title">Sans titre, 2024</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="architecture" data-title="Appartement, Paris">
+        <img src="images/archi-01.jpg" alt="Architecture 01" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Architecture d'intérieur</span>
+            <span class="gallery-title">Appartement, Paris</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="photographie" data-title="Lumière rasante">
+        <img src="images/photo-02.jpg" alt="Photographie 02" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Photographie</span>
+            <span class="gallery-title">Lumière rasante</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="autres" data-title="Exploration">
+        <img src="images/autre-01.jpg" alt="Autre 01" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Autres</span>
+            <span class="gallery-title">Exploration</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="architecture" data-title="Cuisine ouverte">
+        <img src="images/archi-02.jpg" alt="Architecture 02" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Architecture d'intérieur</span>
+            <span class="gallery-title">Cuisine ouverte</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="photographie" data-title="Contre-jour">
+        <img src="images/photo-03.jpg" alt="Photographie 03" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Photographie</span>
+            <span class="gallery-title">Contre-jour</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="photographie" data-title="Mouvement">
+        <img src="images/photo-04.jpg" alt="Photographie 04" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Photographie</span>
+            <span class="gallery-title">Mouvement</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="architecture" data-title="Salon minimaliste">
+        <img src="images/archi-03.jpg" alt="Architecture 03" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Architecture d'intérieur</span>
+            <span class="gallery-title">Salon minimaliste</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-item" data-category="autres" data-title="Fragment">
+        <img src="images/autre-02.jpg" alt="Autre 02" loading="lazy" />
+        <div class="gallery-overlay">
+          <div class="gallery-meta">
+            <span class="gallery-category">Autres</span>
+            <span class="gallery-title">Fragment</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lightbox">
+    <div id="lightbox-close">Fermer ✕</div>
+    <img id="lightbox-img" src="" alt="" />
+    <div id="lightbox-nav">
+      <button class="lb-btn" id="lb-prev">←</button>
+      <span id="lightbox-counter">1 / 1</span>
+      <button class="lb-btn" id="lb-next">→</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <span>Nathan Berlemont</span>
+    <span>Berlemont — Archives</span>
+    <a href="https://instagram.com/_nathan_design_berlemont" target="_blank" rel="noopener">Instagram</a>
+  </footer>
+
+  <script>
+    // ── Custom cursor ──
+    const cursor = document.getElementById('cursor');
+    let mx = -100, my = -100;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top  = my + 'px';
+    });
+    document.querySelectorAll('a, button, .gallery-item').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+    });
+
+    // ── Filter ──
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const items = document.querySelectorAll('.gallery-item');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.dataset.filter;
+        items.forEach(item => {
+          const match = f === 'all' || item.dataset.category === f;
+          item.classList.toggle('hidden', !match);
+          // Re-trigger reveal for visible items
+          if (match) {
+            setTimeout(() => observer.observe(item), 0);
+          }
+        });
+      });
+    });
+
+    // ── Scroll reveal ──
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    items.forEach(item => observer.observe(item));
+
+    // ── Lightbox ──
+    const lightbox = document.getElementById('lightbox');
+    const lbImg    = document.getElementById('lightbox-img');
+    const lbClose  = document.getElementById('lightbox-close');
+    const lbPrev   = document.getElementById('lb-prev');
+    const lbNext   = document.getElementById('lb-next');
+    const lbCounter = document.getElementById('lightbox-counter');
+
+    let visibleItems = [];
+    let currentIdx = 0;
+
+    function openLightbox(idx) {
+      visibleItems = [...document.querySelectorAll('.gallery-item:not(.hidden)')];
+      currentIdx = idx;
+      showLightboxItem();
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function showLightboxItem() {
+      const item = visibleItems[currentIdx];
+      const src  = item.querySelector('img').src;
+      const alt  = item.querySelector('img').alt;
+      lbImg.src = src;
+      lbImg.alt = alt;
+      lbCounter.textContent = (currentIdx + 1) + ' / ' + visibleItems.length;
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+      setTimeout(() => { lbImg.src = ''; }, 400);
+    }
+
+    items.forEach((item, i) => {
+      item.addEventListener('click', () => {
+        const visible = [...document.querySelectorAll('.gallery-item:not(.hidden)')];
+        const idx = visible.indexOf(item);
+        if (idx !== -1) openLightbox(idx);
+      });
+    });
+
+    lbClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+    lbPrev.addEventListener('click', e => {
+      e.stopPropagation();
+      currentIdx = (currentIdx - 1 + visibleItems.length) % visibleItems.length;
+      showLightboxItem();
+    });
+    lbNext.addEventListener('click', e => {
+      e.stopPropagation();
+      currentIdx = (currentIdx + 1) % visibleItems.length;
+      showLightboxItem();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape')      closeLightbox();
+      if (e.key === 'ArrowLeft')  { currentIdx = (currentIdx - 1 + visibleItems.length) % visibleItems.length; showLightboxItem(); }
+      if (e.key === 'ArrowRight') { currentIdx = (currentIdx + 1) % visibleItems.length; showLightboxItem(); }
+    });
+
+    // ── Smooth nav scroll highlight ──
+    const sections = ['photographie', 'architecture', 'autres'];
+    const navLinks = document.querySelectorAll('.nav-link');
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY + window.innerHeight / 2;
+      // simple highlight based on filter active
+    });
+  </script>
+</body>
+</html>
